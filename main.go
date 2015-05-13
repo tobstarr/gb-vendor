@@ -12,8 +12,10 @@ import (
 
 func main() {
 	var projectdir string
+	var update bool
 
 	flag.StringVar(&projectdir, "p", os.Getenv("GB_PROJECT_DIR"), "project directory")
+	flag.BoolVar(&update, "u", false, "run with `go get -u`")
 	flag.Parse()
 
 	vendor := filepath.Join(projectdir, "vendor")
@@ -26,9 +28,13 @@ func main() {
 		log.Fatal(err)
 	}
 
+	args := []string{"go", "get", "-d"}
+	if update {
+		args = append(args, "-u")
+	}
 	cmd := exec.Cmd{
 		Path: gotool,
-		Args: append([]string{"go", "get", "-d"}, flag.Args()...),
+		Args: append(args, flag.Args()...),
 		Env:  env,
 
 		Stdout: os.Stdout,
